@@ -14,22 +14,27 @@ function Game({ Ai, chosePlayer }) {
    const [gameBox, setGameBox] = useState(Array(9).fill(0));
    const [isXTurn, setIsXTurn] = useState(true);
    const [gameWon, setGamewon] = useState(false);
+   const audio = new Audio("./move.mp3");
+   const winAudio = new Audio("./win.mp3");
 
    const gameHandler = (i) => {
-      const arr = handleBoxClick(i, gameBox, isXTurn ? "X" : "O");
-      if (!Ai) {
-         setIsXTurn((prev) => !prev);
-      }
-      if (arr && Ai) {
-         setTimeout(() => {
-            const index = AiPlay(arr, winningCondition, isXTurn ? "O" : "X");
-            handleBoxClick(index, arr, isXTurn ? "O" : "X");
-         }, 200);
+      if (!gameWon) {
+         const arr = handleBoxClick(i, gameBox, isXTurn ? "X" : "O");
+         if (!Ai) {
+            setIsXTurn((prev) => !prev);
+         }
+         if (arr && Ai) {
+            setTimeout(() => {
+               const index = AiPlay(arr, winningCondition, isXTurn ? "O" : "X");
+               handleBoxClick(index, arr, isXTurn ? "O" : "X");
+            }, 200);
+         }
       }
    };
 
    const handleBoxClick = (index, gameBoard, turn) => {
-      if (gameBoard[index] == 0 && !gameWon) {
+      if (gameBoard[index] == 0) {
+         audio.play();
          const arr = [...gameBoard];
          arr[index] = turn;
          setGameBox(arr);
@@ -49,10 +54,12 @@ function Game({ Ai, chosePlayer }) {
             gameArr[combi[0]] === gameArr[combi[2]] &&
             gameArr[combi[0]] !== 0
          ) {
+            winAudio.play()
             return `${turn} Won`;
          }
       }
       if (gameArr.indexOf(0) == -1) {
+         winAudio.play()
          return `Draw`;
       }
       return null;
